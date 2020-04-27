@@ -6,10 +6,6 @@ const isAuth = require("../Middlewares/isAuthenticated");
 const isAdmin = require("../Middlewares/isAdmin");
 const jsonwebtoken = require("jsonwebtoken");
 
-/* GET users listing. */
-router.get("/", function(req, res, next) {
-  res.send(`respond with a resource${process.env.MONGO_ATLAS_PW}`);
-});
 router.post("/register", async (req, res, next) => {
   const AdminPassword = "admin";
   let ADMINchecker = false;
@@ -69,6 +65,7 @@ router.post("/login", async (req, res, next) => {
     {
       email: user.email,
       userId: user._id,
+      firstName: user.fname,
       fullname: user.fname + " " + user.lname,
       IsAdmin: user.IsAdmin
     },
@@ -83,8 +80,9 @@ router.post("/login", async (req, res, next) => {
   });
 });
 
-router.get("/user", isAuth, function(req, res, next) {
-  console.log(req);
-  res.send(`respond with a resource${process.env.MONGO_ATLAS_PW}`);
+router.get("/", isAuth, function(req, res, next) {
+  res.status(202).json({
+    user: req.user
+  });
 });
 module.exports = router;
