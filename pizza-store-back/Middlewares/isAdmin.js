@@ -1,5 +1,5 @@
 function isAdmin(req, res, next) {
-  if (!req.user.isAdmin)
+  if (!req.user.IsAdmin)
     return res.status(404).json({
       error: "sorry you are not authorized to do this action"
     });
