@@ -10,48 +10,37 @@ const jsonwebtoken = require("jsonwebtoken");
 router.get("/", function(req, res, next) {
   res.send(`respond with a resource${process.env.MONGO_ATLAS_PW}`);
 });
-router.post("/register", (req, res, next) => {
+router.post("/register", async (req, res, next) => {
   const AdminPassword = "admin";
   let ADMINchecker = false;
   if (req.body.IsAdmin == AdminPassword) {
     ADMINchecker = true;
+  } else if (req.body.IsAdmin) {
+    return res.status(400).json({
+      error: "admin code is not right please type admin"
+    });
   }
-  console.log(req.body);
-  User.count(
-    {
-      email: req.body.email
-    },
-    function(err, count) {
-      if (count <= 0) {
-        console.log("here");
-        const user = new User({
-          _id: new mongoose.Types.ObjectId(),
-          fname: req.body.fname,
-          lname: req.body.lname,
-          IsAdmin: ADMINchecker,
-          email: req.body.email,
-          Password: req.body.password
-        });
-        user
-          .save()
-          .then(result => {
-            res.status(201).json({
-              user: result,
-              error: "User Created"
-            });
-          })
-          .catch(err => {
-            res.status(500).json({
-              error: err
-            });
-          });
-      } else {
-        return res.status(409).json({
-          error: "This Email is already exists"
-        });
-      }
-    }
-  );
+  let userExists = await User.findOne({ email: req.body.email });
+  console.log(userExists);
+  if (userExists) {
+    console.log(userExists);
+    return res.status(409).json({
+      error: "This Email is already exists"
+    });
+  }
+  const user = new User({
+    _id: new mongoose.Types.ObjectId(),
+    fname: req.body.fname,
+    lname: req.body.lname,
+    IsAdmin: ADMINchecker,
+    email: req.body.email,
+    Password: req.body.password
+  });
+  let userRes = await user.save();
+  res.status(201).json({
+    user: userRes,
+    message: "User Created"
+  });
 });
 
 router.post("/login", async (req, res, next) => {
@@ -89,7 +78,7 @@ router.post("/login", async (req, res, next) => {
     }
   );
   return res.status(200).json({
-    error: "Authenticaion Successful",
+    message: "Authenticaion Successful",
     token: token
   });
 });
