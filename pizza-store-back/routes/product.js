@@ -22,8 +22,11 @@ router.get("/", async function(req, res, next) {
     res.status(202).json({
       products: allProducts
     });
-  } catch (err) {}
-  res.send(`respond with a resource${process.env.MONGO_ATLAS_PW}`);
+  } catch (err) {
+    res.status(400).json({
+      error: err
+    });
+  }
 });
 
 router.post("/add", isAuth, isAdmin, upload.single("image"), async function(
