@@ -32,9 +32,23 @@ router.post("/register", async (req, res, next) => {
     email: req.body.email,
     Password: req.body.password
   });
+  const token = jsonwebtoken.sign(
+    {
+      email: user.email,
+      userId: user._id,
+      firstName: user.fname,
+      fullname: user.fname + " " + user.lname,
+      IsAdmin: user.IsAdmin
+    },
+    process.env.JWT_KEY,
+    {
+      expiresIn: "24h"
+    }
+  );
   let userRes = await user.save();
   res.status(201).json({
     user: userRes,
+    token: token,
     message: "User Created"
   });
 });
@@ -47,11 +61,6 @@ router.post("/login", async (req, res, next) => {
     });
   }
 
-  if (user.length < 1) {
-    return res.status(404).json({
-      error: "Mail is wrong or doesn't exist's"
-    });
-  }
   console.log(user);
   console.log(req.body.password);
 

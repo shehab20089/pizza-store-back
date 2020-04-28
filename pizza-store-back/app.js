@@ -1,4 +1,5 @@
 var express = require("express");
+var cors = require("cors");
 const mongoos = require("mongoose");
 const env = require("dotenv").config();
 var path = require("path");
@@ -13,6 +14,7 @@ mongoos.connect(
 );
 
 var app = express();
+app.use(cors());
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
