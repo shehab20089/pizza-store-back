@@ -3,8 +3,6 @@
 this is a node js pizza app store to allow customers to view list of pizza and  
 and add them to cart and order them to send it to the pizza store and there is 2 roles there is an admin and a normal user admin can add pizza while user can use history to view old orders
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
-
 ## To run app
 
 ### `cd pizza-store-back/`
