@@ -1,11 +1,14 @@
 const express = require("express");
 const router = express.Router();
+const fs = require("fs");
 const mongoose = require("mongoose");
 const Product = require("../Models/Product");
 const isAuth = require("../Middlewares/isAuthenticated");
 const isAdmin = require("../Middlewares/isAdmin");
 const jsonwebtoken = require("jsonwebtoken");
+const { promisify } = require("util");
 const multer = require("multer");
+const AWS = require("aws-sdk");
 const storage = multer.diskStorage({
   destination: function(req, res, cb) {
     cb(null, "./uploads/");
@@ -15,6 +18,30 @@ const storage = multer.diskStorage({
   }
 });
 const upload = multer({ storage: storage });
+
+const ID = process.env.AWS_ACCESS_KEY;
+const SECRET = process.env.AWS_SECRET_KEY;
+let uploadFile = () => {};
+if (process.env.bucket_name) {
+  const s3 = new AWS.S3({
+    accessKeyId: ID,
+    secretAccessKey: SECRET
+  });
+  const fsPromise = promisify(fs.readFile);
+  const s3Promise = promisify(s3.upload).bind(s3);
+  uploadFile = async fileName => {
+    const fileContent = await fsPromise(fileName);
+
+    const params = {
+      Bucket: process.env.bucket_name,
+      Key: Date.now() + "pizza.jpg",
+      Body: fileContent
+    };
+
+    // Uploading files to the bucket
+    return await s3Promise(params);
+  };
+}
 
 router.get("/", async function(req, res, next) {
   try {
@@ -34,14 +61,19 @@ router.post("/add", isAuth, isAdmin, upload.single("image"), async function(
   res,
   next
 ) {
-  console.log(req.file);
+  console.log(req.file.stream);
+  let filelink = req.file.path;
+  if (process.env.bucket_name) {
+    filelink = await uploadFile(req.file.path);
+  }
+  console.log(filelink.Location);
 
   let newProdut = new Product({
     _id: new mongoose.Types.ObjectId(),
     name: req.body.name,
     description: req.body.description,
     price: req.body.price,
-    image: req.file.path
+    image: process.env.bucket_name ? filelink.Location : req.file.path
   });
   try {
     let Product = await newProdut.save();
