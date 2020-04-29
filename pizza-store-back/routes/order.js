@@ -24,9 +24,13 @@ router.get("/", isAuthenticated, async (req, res, next) => {
 });
 
 router.post("/", isUser, async (req, res, next) => {
+  console.log(req.body);
+  let userId = new mongoose.Types.ObjectId();
+  if (req.user) userId = req.user.userId;
+
   let newOrder = new Order({
     _id: new mongoose.Types.ObjectId(),
-    user_id: req.user.userId,
+    user_id: userId,
     Products: req.body.Products,
     Address: req.body.Address,
     phone: req.body.phone,

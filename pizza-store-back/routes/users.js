@@ -47,7 +47,13 @@ router.post("/register", async (req, res, next) => {
   );
   let userRes = await user.save();
   res.status(201).json({
-    user: userRes,
+    user: {
+      email: userRes.email,
+      userId: userRes._id,
+      firstName: userRes.fname,
+      fullname: userRes.fname + " " + user.lname,
+      IsAdmin: userRes.IsAdmin
+    },
     token: token,
     message: "User Created"
   });

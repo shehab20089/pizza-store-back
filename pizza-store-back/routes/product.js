@@ -34,6 +34,8 @@ router.post("/add", isAuth, isAdmin, upload.single("image"), async function(
   res,
   next
 ) {
+  console.log(req.file);
+
   let newProdut = new Product({
     _id: new mongoose.Types.ObjectId(),
     name: req.body.name,
@@ -48,7 +50,7 @@ router.post("/add", isAuth, isAdmin, upload.single("image"), async function(
       message: "Pizza added successfully"
     });
   } catch (err) {
-    res.status(400);
+    res.status(400).json({ error: "error uploading image", err });
   }
 });
 

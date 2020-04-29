@@ -5,7 +5,14 @@ const OrdersSchema = mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     default: new mongoose.Types.ObjectId()
   },
-  Products: [{ id: mongoose.Schema.Types.ObjectId, quantity: Number }],
+  Products: [
+    {
+      id: mongoose.Schema.Types.ObjectId,
+      name: String,
+      quantity: Number,
+      price: Number
+    }
+  ],
   Address: { type: String, required: true },
   phone: { type: String, required: true },
   name: { type: String, required: true }
