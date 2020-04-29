@@ -66,14 +66,15 @@ router.post("/add", isAuth, isAdmin, upload.single("image"), async function(
   if (process.env.bucket_name) {
     filelink = await uploadFile(req.file.path);
   }
-  console.log(filelink.Location);
 
   let newProdut = new Product({
     _id: new mongoose.Types.ObjectId(),
     name: req.body.name,
     description: req.body.description,
     price: req.body.price,
-    image: process.env.bucket_name ? filelink.Location : req.file.path
+    image: process.env.bucket_name
+      ? filelink.Location
+      : "http://" + req.headers.host + "/api/" + req.file.path
   });
   try {
     let Product = await newProdut.save();
